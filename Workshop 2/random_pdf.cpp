@@ -6,7 +6,6 @@
 #include <bits/stdc++.h> 
 #include <fstream>
 
-double normal_dist(double num, double mu, double sigma);
 void compute_pdf(int seed, int nsamples, double mu, double sigma, double xmin, double xmax, int nbins);
 
 int main(int argc, char **argv)
@@ -37,19 +36,35 @@ void compute_pdf(int seed, int nsamples, double mu, double sigma, double xmin, d
     // TODO: fill here the counting histogram stuff
   }
 
-  std::sort(muestra.begin(), muestra.end());
-  std::ofstream txt_dist("dist.txt");
-  for(int h=0; h<muestra.size();h++){
-    pdf.push_back(normal_dist(muestra[h], mu, sigma));
-    txt_dist << muestra[h] << "\t" << pdf[h] << "\t" << "\n";
+  for(int h = 0; h<50; h++){
+    pdf.push_back(0);
   }
+
+  double gap = (xmax-xmin)/nbins;
+  for(int k=0;k<nbins;k++){
+    for(int i=0;i<muestra.size();i++){
+      if(xmin+(k*gap)<=muestra[i] && muestra[i]<=xmin+((k+1)*gap)){
+        pdf[k]+=1;
+      }
+    }
+  }
+
+  double mayor = 0;
+  for(int l=0;l<pdf.size();l++){
+    if(pdf[l]>mayor){
+      mayor=pdf[l];
+    }
+  }
+
+  std::ofstream txt_dist("dist.txt");
+  double prob = 0;
+  for(int j=0;j<pdf.size();j++){
+    txt_dist << xmin+((2*j+1)*(gap/2)) << "\t" << pdf[j]/mayor << "\n";
+    prob+=pdf[j]/muestra.size();
+  }
+  std::cout << prob;
   txt_dist.close();
   
   // TODO: compute and print the pdf
 
-}
-
-double normal_dist(double num, double mu, double sigma){
-  double nd = (1/(sigma*sqrt(2*M_PI)))*exp(-0.5*pow((num-mu)/sigma, 2));
-  return nd;
 }
