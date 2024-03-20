@@ -1,0 +1,19 @@
+SHELL:=/bin/bash
+CXXFLAGS = -Wall -O3
+TEST_CXXFLAGS = -Wall -O3 -I./catch2
+
+vector_main: vector_main.cpp vector_ops.cpp
+	source $$HOME/spack/share/spack/setup-env.sh; \
+    spack load catch2; \
+    g++ $$(CXXFLAGS) $^ -o $@
+
+vector_test: vector_test.cpp vector_ops.cpp
+	g++ $$(TEST_CXXFLAGS) $^ -o $@
+
+%.o: %.cpp
+	g++ -c $^ -o $@
+
+.PHONY : clean
+
+clean:
+	rm -f *.o *.x
